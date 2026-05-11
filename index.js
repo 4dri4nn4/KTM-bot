@@ -346,6 +346,9 @@ sendToAnnouncements({
     COLORS.cage,
     EVENT_IMAGES.cage
   }, { timezone: TIMEZONE });
+cron.schedule('* * * * *', () => {
+    console.log('⏰ KTM test cron working');
+});
 
   // =========================
   // CAGE 1 — ST 17 / UK 20 — every 48h
