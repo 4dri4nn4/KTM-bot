@@ -10,6 +10,7 @@ const {
 
 const cron = require('node-cron');
 const fs = require('fs');
+const translate = require('translate');
 
 const client = new Client({
   intents: [
@@ -106,6 +107,28 @@ function ping(roleId) {
 
 function translationLine() {
   return `
+  
+async function translateLong(text, target) {
+  const chunkSize = 4000;
+
+  const chunks = [];
+
+  for (let i = 0; i < text.length; i += chunkSize) {
+    chunks.push(text.slice(i, i + chunkSize));
+  }
+
+  const translated = [];
+
+  for (const chunk of chunks) {
+    const result = await translate(chunk, {
+      to: target
+    });
+
+    translated.push(result.text);
+  }
+
+  return translated.join('\\n');
+}
 
 🌍 Reply with your flag for translation 🇫🇷 🇮🇹 🇪🇸 🇬🇧`;
 }
@@ -918,6 +941,47 @@ if (content === '!clearcheckins') {
   return message.reply('🧹 Check-in history cleared.');
 }
 
+// TRANSLATE
+if (content.startsWith('!translate')) {
+
+  const parts = content.split(' ');
+
+  const language = parts[1];
+
+  const text = parts.slice(2).join(' ');
+
+  if (!language || !text) {
+    return message.reply(
+      'Use:\n`!translate fr hello`\n`!translate en bonjour`'
+    );
+  }
+
+  try {
+
+    const translated = await translateLong(
+      text,
+      language
+    );
+
+    const embed = createEventEmbed(
+      `🌍 Translation → ${language.toUpperCase()}`,
+      translated
+    );
+
+    return message.reply({
+      embeds: [embed]
+    });
+
+  } catch {
+
+    return message.reply(
+      '❌ Translation failed'
+    );
+
+  }
+
+}
+
   // HELP
 if (content === '!help') {
   const embed = createEventEmbed(
@@ -933,6 +997,7 @@ if (content === '!help') {
 \`!rules\` — show alliance rules
 \`!checkin\` — event participation check-in
 \`!clearcheckins\` — clear all check-in records
+\`!translate LANG TEXT\` — translate long messages
 
 **Leader Broadcasts**
 \`!announce text\`
@@ -958,6 +1023,11 @@ if (content === '!help') {
 \`!setsandsea YYYY-MM-DD\`
 \`!setsandseatime ST_HOUR\`
 \`!setsandseacycle DAYS\`
+
+**Translation**
+\`!translate fr hello\`
+\`!translate en bonjour\`
+\`!translate ro very long text...
 
 ⚔️ KTM Assistant — chaos, but organised.`
   );
