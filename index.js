@@ -10,7 +10,8 @@ const {
 
 const cron = require('node-cron');
 const fs = require('fs');
-const translate = require('translate');
+const translate = require('translate').default;
+translate.engine = 'google';
 
 const client = new Client({
   intents: [
