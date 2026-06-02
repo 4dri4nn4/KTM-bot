@@ -1035,6 +1035,56 @@ if (content === '!help') {
   return message.reply({ embeds: [embed] });
 }
 
+// TRANSLATE
+if (content.startsWith('!translate ')) {
+
+  const args = message.content.trim().split(' ');
+
+  if (args.length < 3) {
+    return message.reply(
+      'Use: `!translate LANG TEXT`\nExample:\n`!translate fr hello`'
+    );
+  }
+
+  const target = args[1].toLowerCase();
+
+  const text = args.slice(2).join(' ');
+
+  try {
+
+    const translated = await translate(text, {
+      to: target
+    });
+
+    const embed = createEventEmbed(
+      `🌍 Translation → ${target.toUpperCase()}`,
+      `
+📝 Original:
+${text.slice(0, 1500)}
+
+━━━━━━━━━━
+
+✅ Translation:
+${translated}
+`
+    );
+
+    return message.reply({
+      embeds: [embed]
+    });
+
+  } catch (err) {
+
+    console.log(err);
+
+    return message.reply(
+      '❌ Translation failed.'
+    );
+
+  }
+
+}
+
   // SET SVS
   if (content.startsWith('!setsvs')) {
     if (!canManage(message)) return message.reply('Only leaders can change SVS date 😏');
