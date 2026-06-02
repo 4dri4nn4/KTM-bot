@@ -1076,7 +1076,7 @@ ${translated}
 
   } catch (err) {
 
-    console.log(err);
+    console.error('TRANSLATE ERROR:', err);
 
     return message.reply(
       '❌ Translation failed.'
