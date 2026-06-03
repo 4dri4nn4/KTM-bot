@@ -272,7 +272,18 @@ const reactionRoles = {
   '🏝️': ROLE_SANDSEA
 };
 
-
+const translationFlags = {
+  '🇬🇧': 'en',
+  '🇫🇷': 'fr',
+  '🇷🇴': 'ro',
+  '🇪🇸': 'es',
+  '🇮🇹': 'it',
+  '🇹🇷': 'tr',
+  '🇩🇪': 'de',
+  '🇨🇳': 'zh',
+  '🇯🇵': 'ja',
+  '🇲🇾': 'ms'
+};
 
 // =========================
 // BOT READY + AUTO EVENTS
@@ -658,15 +669,51 @@ const embed = createEventEmbed(
 });
 
 // =========================
-// REACTION ROLE ADD
+// REACTION ROLE ADD + FLAG TRANSLATION
 // =========================
 client.on('messageReactionAdd', async (reaction, user) => {
   if (user.bot) return;
 
   if (reaction.partial) await reaction.fetch();
+
+  const emoji = reaction.emoji.name;
+
+  // FLAG TRANSLATION
+  if (translationFlags[emoji]) {
+    const target = translationFlags[emoji];
+    const originalMessage = reaction.message;
+
+    if (!originalMessage.content) return;
+
+    try {
+      const translated = await translateText(
+        originalMessage.content,
+        target
+      );
+
+      const embed = createEventEmbed(
+        `🌍 Translation → ${target.toUpperCase()}`,
+        `**Original**
+${originalMessage.content.slice(0, 1000)}
+
+**Translation**
+${translated.slice(0, 3500)}`
+      );
+
+      return originalMessage.reply({
+        embeds: [embed]
+      });
+
+    } catch (err) {
+      console.error('FLAG TRANSLATE ERROR:', err);
+      return;
+    }
+  }
+
+  // REACTION ROLES
   if (reaction.message.id !== config.roleMessageId) return;
 
-  const roleId = reactionRoles[reaction.emoji.name];
+  const roleId = reactionRoles[emoji];
   if (!roleId) return;
 
   const member = await reaction.message.guild.members.fetch(user.id);
