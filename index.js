@@ -118,16 +118,6 @@ async function translateText(text, target) {
   return data[0].map(part => part[0]).join('');
 }
 
-async function translateText(text, target) {
-  const url =
-    `https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=${target}&dt=t&q=${encodeURIComponent(text)}`;
-
-  const response = await fetch(url);
-  const data = await response.json();
-
-  return data[0].map(part => part[0]).join('');
-}
-
 function createEventEmbed(title, description, color = COLORS.svs, imageUrl = null) {
   const embed = new EmbedBuilder()
     .setColor(color)
@@ -937,40 +927,47 @@ if (content === '!clearcheckins') {
 }
 
 // TRANSLATE
-if (content.startsWith('!translate')) {
+if (content.startsWith('!translate ')) {
 
-  const parts = content.split(' ');
+  const args = content.split(' ');
 
-  const language = parts[1];
-
-  const text = parts.slice(2).join(' ');
-
-  if (!language || !text) {
+  if (args.length < 3) {
     return message.reply(
-      'Use:\n`!translate fr hello`\n`!translate en bonjour`'
+      'Use: `!translate fr hello`'
     );
   }
 
+  const target = args[1].toLowerCase();
+
+  const text = args.slice(2).join(' ');
+
   try {
 
-    const translated = await translateLong(
-      text,
-      language
-    );
+    const translated =
+      await translateText(
+        text,
+        target
+      );
 
-    const embed = createEventEmbed(
-      `🌍 Translation → ${language.toUpperCase()}`,
-      translated
-    );
+    const embed =
+      createEventEmbed(
+        `🌍 Translation → ${target.toUpperCase()}`,
+        translated
+      );
 
     return message.reply({
       embeds: [embed]
     });
 
-  } catch {
+  } catch (err) {
+
+    console.error(
+      'TRANSLATE ERROR:',
+      err
+    );
 
     return message.reply(
-      '❌ Translation failed'
+      '❌ Translation failed.'
     );
 
   }
