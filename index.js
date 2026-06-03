@@ -10,8 +10,6 @@ const {
 
 const cron = require('node-cron');
 const fs = require('fs');
-const translate = require('translate').default;
-translate.engine = 'google';
 
 const client = new Client({
   intents: [
@@ -107,31 +105,27 @@ function ping(roleId) {
 }
 
 function translationLine() {
-  return `
-  
-async function translateLong(text, target) {
-  const chunkSize = 4000;
-
-  const chunks = [];
-
-  for (let i = 0; i < text.length; i += chunkSize) {
-    chunks.push(text.slice(i, i + chunkSize));
-  }
-
-  const translated = [];
-
-  for (const chunk of chunks) {
-    const result = await translate(chunk, {
-      to: target
-    });
-
-    translated.push(result.text);
-  }
-
-  return translated.join('\\n');
+  return '🌍 Reply with your flag for translation FR IT ES GB';
 }
 
-🌍 Reply with your flag for translation 🇫🇷 🇮🇹 🇪🇸 🇬🇧`;
+async function translateText(text, target) {
+  const url =
+    `https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=${target}&dt=t&q=${encodeURIComponent(text)}`;
+
+  const response = await fetch(url);
+  const data = await response.json();
+
+  return data[0].map(part => part[0]).join('');
+}
+
+async function translateText(text, target) {
+  const url =
+    `https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=${target}&dt=t&q=${encodeURIComponent(text)}`;
+
+  const response = await fetch(url);
+  const data = await response.json();
+
+  return data[0].map(part => part[0]).join('');
 }
 
 function createEventEmbed(title, description, color = COLORS.svs, imageUrl = null) {
