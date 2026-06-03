@@ -683,7 +683,7 @@ console.log('REACTION DETECTED:', emoji, 'by', user.username);
   // FLAG TRANSLATION
   if (translationFlags[emoji]) {
     const target = translationFlags[emoji];
-    const originalMessage = reaction.message;
+    const originalMessage = await reaction.message.fetch();
 
     if (!originalMessage.content) return;
 
@@ -975,53 +975,6 @@ if (content === '!clearcheckins') {
   return message.reply('🧹 Check-in history cleared.');
 }
 
-// TRANSLATE
-if (content.startsWith('!translate ')) {
-
-  const args = content.split(' ');
-
-  if (args.length < 3) {
-    return message.reply(
-      'Use: `!translate fr hello`'
-    );
-  }
-
-  const target = args[1].toLowerCase();
-
-  const text = args.slice(2).join(' ');
-
-  try {
-
-    const translated =
-      await translateText(
-        text,
-        target
-      );
-
-    const embed =
-      createEventEmbed(
-        `🌍 Translation → ${target.toUpperCase()}`,
-        translated
-      );
-
-    return message.reply({
-      embeds: [embed]
-    });
-
-  } catch (err) {
-
-    console.error(
-      'TRANSLATE ERROR:',
-      err
-    );
-
-    return message.reply(
-      '❌ Translation failed.'
-    );
-
-  }
-
-}
 
   // HELP
 if (content === '!help') {
