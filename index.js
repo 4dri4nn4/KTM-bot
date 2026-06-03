@@ -673,11 +673,12 @@ const embed = createEventEmbed(
 // =========================
 client.on('messageReactionAdd', async (reaction, user) => {
   if (user.bot) return;
-  console.log('REACTION DETECTED:', reaction.emoji.name, 'by', user.username);
 
   if (reaction.partial) await reaction.fetch();
 
-  const emoji = reaction.emoji.name;
+  const emoji = reaction.emoji.toString();
+
+console.log('REACTION DETECTED:', emoji, 'by', user.username);
 
   // FLAG TRANSLATION
   if (translationFlags[emoji]) {
